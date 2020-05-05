@@ -16,7 +16,7 @@ class Mbti(models.Model):
         )
     content = models.TextField(
         verbose_name = 'post',
-        max_length = 1000
+        max_length = 4000
     )
     type = models.TextField(
         verbose_name = 'type',
