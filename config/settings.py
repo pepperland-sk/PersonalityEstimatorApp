@@ -1,6 +1,5 @@
 import os
 import django_heroku
-from . import local_settings
 from os import environ
 from socket import gethostname
 
@@ -15,6 +14,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HOSTNAME = gethostname()
 
 if 'local' in HOSTNAME:
+    from . import local_settings
     SECRET_KEY = local_settings.SECRET_KEY
 else:
     SECRET_KEY = environ['SECRET_KEY']
