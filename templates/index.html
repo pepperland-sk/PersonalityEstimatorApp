@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Determine your personalitiy from your sentence.
+This diagnosis follows MBTI (Myers–Briggs Type Indicator), but does not guarantee any acuracy.">
+    <title>PersonalityEstimator</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+<link href="{% static 'style.css' %}" rel="stylesheet">
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+
+<!-- axios -->
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<div id="app"> 
+    <header class="page-header wrapper">
+        <div class="title">Personality Estimator</div>
+        <div class="description">Determine your personalitiy from your sentence. <br>
+This diagnosis follows MBTI (Myers–Briggs Type Indicator), but does not guarantee any acuracy.</div>
+    </header>
+    <section>
+        <form>
+            <div class="page-input wrapper">
+                <div class="message"> #{ errors } </div>
+                <textarea class="textarea" placeholder="input some texts (English only)" v-model="form.mbti.content"></textarea>
+                <button v-on:click.prevent="onSubmit" class="submit">See results</button>
+            </div>
+            <div> <!-- test -->
+            </div>
+        </form>
+    </section>
+    <section class="page-output wrapper">
+        <div>
+            <div>your type is...<span class="label" v-cloak>#{ response.label } - #{ response.type } </span></div>
+        </div>
+        <div class="spwrapper wrapper">
+            <div class="row">
+                <div class="factor">
+                    <div class="factor-initial">I</div>
+                    <div class="factor-description">Introverts</div>
+                </div>
+                <div class ="rectangle" v-bind:style="styleObject.score_i" v-cloak>#{ response.score_i } %</div>
+                <div class ="rectangle" v-bind:style="styleObject.score_e" v-cloak>#{ response.score_e } %</div>
+                <div class="factor">
+                    <div class="factor-initial">E</div>
+                    <div class="factor-description">Extroverts</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="factor">
+                    <div class="factor-initial">S</div>
+                    <div class="factor-description">Sensors</div>
+                </div>
+                <div class ="rectangle" v-bind:style="styleObject.score_s" v-cloak>#{ response.score_s } %</div>
+                <div class ="rectangle" v-bind:style="styleObject.score_n" v-cloak>#{ response.score_n } %</div>
+                <div class="factor">
+                    <div class="factor-initial">N</div>
+                    <div class="factor-description">Intuitives</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="factor">
+                    <div class="factor-initial">T</div>
+                    <div class="factor-description">Thinkers</div>
+                </div>
+                <div class ="rectangle" v-bind:style="styleObject.score_t" v-cloak>#{ response.score_t } %</div>
+                <div class ="rectangle" v-bind:style="styleObject.score_f" v-cloak>#{ response.score_f } %</div>
+                <div class="factor">
+                    <div class="factor-initial">F</div>
+                    <div class="factor-description">Feelers</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="factor">
+                    <div class="factor-initial">P</div>
+                    <div class="factor-description">Perceivers</div>
+                </div>
+                <div class ="rectangle" v-bind:style="styleObject.score_p" v-cloak>#{ response.score_p } %</div>
+                <div class ="rectangle" v-bind:style="styleObject.score_j" v-cloak>#{ response.score_j } %</div>
+                <div class="factor">
+                    <div class="factor-initial">J</div>
+                    <div class="factor-description">Judgers</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="page-footer wrapper">
+        <div class="annotation">This site is made by Shoki Kato</div>
+    </footer>
+</div>
+</body>
+
+<script>
+Vue.options.delimiters = ['#{', '}']
+
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+
+const api = axios.create({
+    baseURL: '/api/v1/',
+    timeout: 5000,
+    headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+    }
+})
+
+
+
+var app = new Vue({
+    el: '#app',
+    data: {
+        styleObject: {
+            score_i: {background: "", width: "240px"},
+            score_e: {background: "", width: "240px"},
+            score_s: {background: "", width: "240px"},
+            score_n: {background: "", width: "240px"},
+            score_t: {background: "", width: "240px"},
+            score_f: {background: "", width: "240px"},
+            score_p: {background: "", width: "240px"},
+            score_j: {background: "", width: "240px"},
+        },
+        form: {
+            mbti: {
+                content: ''
+            }
+        },
+        response: {
+            label: '',
+            type: '',
+            score_i: '',
+            score_e: '',
+            score_s: '',
+            score_n: '',
+            score_t: '',
+            score_f: '',
+            score_p: '',
+            score_j: '',
+        },
+        errors: ""
+    },
+    methods: {
+        onSubmit: function() {
+            axios.post('api/v1', {
+                content: this.form.mbti.content
+                })
+            .then(response => (
+                this.errors = "",
+                this.response.label = response.data.label,
+                this.response.type = response.data.type,
+                this.response.score_i = Math.round(response.data.score_ie[0] * 10000) / 100,
+                this.response.score_e = Math.round(response.data.score_ie[1] * 10000) / 100,
+                this.response.score_s = Math.round(response.data.score_sn[0] * 10000) / 100,
+                this.response.score_n = Math.round(response.data.score_sn[1] * 10000) / 100,
+                this.response.score_t = Math.round(response.data.score_tf[0] * 10000) / 100,
+                this.response.score_f = Math.round(response.data.score_tf[1] * 10000) / 100,
+                this.response.score_p = Math.round(response.data.score_pj[0] * 10000) / 100,
+                this.response.score_j = Math.round(response.data.score_pj[1] * 10000) / 100,
+                this.styleObject.score_i.background = "rgba(33, 150, 83, "+response.data.score_ie[0]+")",
+                this.styleObject.score_e.background = "rgba(33, 150, 83, "+response.data.score_ie[1]+")",
+                this.styleObject.score_s.background = "rgba(33, 150, 83, "+response.data.score_sn[0]+")",
+                this.styleObject.score_n.background = "rgba(33, 150, 83, "+response.data.score_sn[1]+")",
+                this.styleObject.score_t.background = "rgba(33, 150, 83, "+response.data.score_tf[0]+")",
+                this.styleObject.score_f.background = "rgba(33, 150, 83, "+response.data.score_tf[1]+")",
+                this.styleObject.score_p.background = "rgba(33, 150, 83, "+response.data.score_pj[0]+")",
+                this.styleObject.score_j.background = "rgba(33, 150, 83, "+response.data.score_pj[1]+")",
+                this.styleObject.score_i.width = 480 * response.data.score_ie[0]+"px",
+                this.styleObject.score_e.width = 480 * response.data.score_ie[1]+"px",
+                this.styleObject.score_s.width = 480 * response.data.score_sn[0]+"px",
+                this.styleObject.score_n.width = 480 * response.data.score_sn[1]+"px",
+                this.styleObject.score_t.width = 480 * response.data.score_tf[0]+"px",
+                this.styleObject.score_f.width = 480 * response.data.score_tf[1]+"px",
+                this.styleObject.score_p.width = 480 * response.data.score_pj[0]+"px",
+                this.styleObject.score_j.width = 480 * response.data.score_pj[1]+"px"
+                ))
+            .catch(error => (
+                console.log(error),
+                this.errors = error.response.data.content[0]
+                ))
+        }
+    } 
+})
+</script>
