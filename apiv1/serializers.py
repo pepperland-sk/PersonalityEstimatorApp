@@ -13,7 +13,7 @@ class MbtiSerializer(serializers.ModelSerializer):
                 'write_only' : True,
                 'validators' : [
                     RegexValidator(
-                        r'^[a-zA-Z0-9\s\n!-/:-@¥[-`{-~]+$', message="This field only allows English"
+                        r'^[a-zA-Z0-9\s\n!-/:-@¥[-`{-~’]+$', message="This field only allows English"
                     )
                 ]
             }
