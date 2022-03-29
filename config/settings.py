@@ -13,7 +13,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 HOSTNAME = gethostname()
 
-if 'local' in HOSTNAME:
+if ('local' in HOSTNAME) | ('DESKTOP' in HOSTNAME):
     from . import local_settings
     SECRET_KEY = local_settings.SECRET_KEY
 else:
