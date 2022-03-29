@@ -14,7 +14,8 @@ This diagnosis follows MBTI (Myers–Briggs Type Indicator), but does not guaran
 <link href="{% static 'style.css' %}" rel="stylesheet">
 
 <!-- JS -->
-<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+{% comment %} <script src="https://cdn.jsdelivr.net/npm/vue"></script> {% endcomment %}
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
 
 <!-- axios -->
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -99,7 +100,7 @@ This diagnosis follows MBTI (Myers–Briggs Type Indicator), but does not guaran
 </body>
 
 <script>
-{% comment %} Vue.options.delimiters = ['#{', '}'] {% endcomment %}
+Vue.options.delimiters = ['#{', '}']
 
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
@@ -113,11 +114,8 @@ const api = axios.create({
     }
 })
 
-
-
 var app = new Vue({
     el: '#app',
-    delimiters: ['#{', '}'],
     data: {
         styleObject: {
             score_i: {background: "", width: "240px"},
